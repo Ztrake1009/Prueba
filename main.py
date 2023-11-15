@@ -444,21 +444,19 @@ def acomodo_Cajas_1():
                 X_Destino = elem_Sum1.posx
                 Y_Destino = elem_Sum1.posy
 
+
                 # Ejecuta el movimiento, primero en X y luego en Y.
                 # Primero se mueve hacia la caja que debe recoger.
                 Mensaje.config(text="Moviendo Grua hacia la caja por recoger.")
                 mover_Grua_X(X_Destino)
-                time.sleep(0.1)
-                ventana.update()
 
                 mover_Grua_Y(Y_Destino)
-                time.sleep(0.1)
                 Mensaje.config(text="Recogiendo caja.")
                 ventana.update()
 
                 actualizar_Suministro1(X_Destino, Y_Destino)
-                time.sleep(0.1)
-                ventana.update()
+                agarre_grua(elem_Sum1.color,X_Actual,Y_Actual)
+
 
                 X_Destino = elem_Carga.posx
                 Y_Destino = elem_Carga.posy
@@ -466,17 +464,15 @@ def acomodo_Cajas_1():
                 # Ahora se mueve hacia el espacio donde debe dejar la caja.
                 Mensaje.config(text="Moviendo Grua hacia el espacio designado.")
                 mover_Grua_X(X_Destino)
-                time.sleep(0.1)
                 ventana.update()
 
                 mover_Grua_Y(Y_Destino)
-                time.sleep(0.1)
                 Mensaje.config(text="Dejando caja.")
                 ventana.update()
-
+    
                 actualizar_Carga(elem_Carga.color, X_Destino, Y_Destino)
-                time.sleep(0.1)
-                ventana.update()
+                agarre_grua("naranja",X_Destino,Y_Destino)
+                
                 letras_Carga[pos_Carga] = 0
 
                 lista_Suministro1[pos_Sum1].color = ""
@@ -505,13 +501,40 @@ def mover_Grua_X(X_Destino):
 
     # Movimiento horizontal.
     movimiento_X = X_Destino - X_Actual
+    sum = movimiento_X/4
+    #mov = 2 #movimiento_X/10
+    if movimiento_X>0:
+        mov = 4
+    elif movimiento_X<0:
+        mov = -4
 
     # Si ya está en la misma posición en X que el destino.
     if (X_Actual == X_Destino):
         movimiento_X = 0
 
-    lienzo.move(grua, movimiento_X, 0)
 
+    while X_Actual != X_Destino:
+        lienzo.move(grua, mov, 0)
+        X_Actual = X_Actual + mov
+        time.sleep(0.1)
+        ventana.update()
+        if (movimiento_X > 0 and X_Actual >= X_Destino):
+            movimiento_X = X_Destino - X_Actual
+            lienzo.move(grua, movimiento_X, 0)
+            X_Actual = X_Destino
+            time.sleep(0.1)
+            ventana.update()
+            break
+        elif (movimiento_X < 0 and X_Actual <= X_Destino):
+            movimiento_X = X_Destino - X_Actual
+            lienzo.move(grua, movimiento_X, 0)
+            X_Actual = X_Destino
+            
+            time.sleep(0.1)
+            ventana.update()
+            break
+
+    #lienzo.move(grua, movimiento_X, 0)
     X_Actual = X_Destino
     return
 
@@ -522,10 +545,36 @@ def mover_Grua_Y(Y_Destino):
 
     # Movimiento vertical.
     movimiento_Y = Y_Destino - Y_Actual
-    
+    if movimiento_Y>0:
+        mov = 4
+    elif movimiento_Y<0:
+        mov = -4
+
     # Si ya está en la misma posición en Y que el destino.
     if (Y_Actual == Y_Destino):
         movimiento_Y = 0
+
+
+    while Y_Actual != Y_Destino:
+        lienzo.move(grua, 0, mov)
+        Y_Actual = Y_Actual + mov
+        time.sleep(0.1)
+        ventana.update()
+        if (movimiento_Y > 0 and Y_Actual >= Y_Destino):
+            movimiento_Y = Y_Destino - Y_Actual
+            lienzo.move(grua, 0, movimiento_Y)
+            Y_Actual = Y_Destino
+            time.sleep(0.1)
+            ventana.update()
+            break
+        elif (movimiento_Y < 0 and Y_Actual <= Y_Destino):
+            movimiento_Y = Y_Destino - Y_Actual
+            lienzo.move(grua, 0, movimiento_Y)
+            Y_Actual = Y_Destino
+            time.sleep(0.1)
+            ventana.update()
+            break
+    # Si ya está en la misma posición en Y que el destino.
 
     lienzo.move(grua, 0, movimiento_Y)
 
@@ -538,7 +587,7 @@ def actualizar_Suministro1(X_Destino, Y_Destino):
     # Actualiza la matriz de la zona de Suministro 1.
     lienzo.create_rectangle(X_Destino, Y_Destino, X_Destino + 40, Y_Destino + 40, fill="white")
     
-    grua = lienzo.create_oval(X_Actual, Y_Actual, X_Actual + 40, Y_Actual + 40, width=1, fill="orange")
+    #grua = lienzo.create_oval(X_Actual, Y_Actual, X_Actual + 40, Y_Actual + 40, width=1, fill="orange")
     return
 
 
@@ -559,6 +608,8 @@ def agarre_grua(letra,X_Actual,Y_Actual):
         color = "orange"
     # Actualiza la matriz de la zona de Suministro 1.
     grua = lienzo.create_oval(X_Actual, Y_Actual, X_Actual + 40, Y_Actual + 40, width=1, fill=color)
+    time.sleep(1.5)
+    ventana.update()
     return
  
 
@@ -601,6 +652,8 @@ def actualizar_Carga(letra, X_Destino, Y_Destino):
 
     # Actualiza la matriz de la zona de Carga.
     lienzo.create_rectangle(X_Destino, Y_Destino, X_Destino + 40, Y_Destino + 40, width=3, fill=color)
+    time.sleep(1)
+    ventana.update
 
     #grua = lienzo.create_oval(X_Actual, Y_Actual, X_Actual + 40, Y_Actual + 40, width=1, fill="orange")
 
@@ -651,33 +704,24 @@ def acomodo_Cajas_2():
         X_destino = lista_Carga[Pos_act].posx
         Y_destino =  lista_Carga[Pos_act].posy
         mover_Grua_X(X_destino)
-        time.sleep(1)
-        ventana.update()
-
         mover_Grua_Y(Y_destino)
-        time.sleep(1)
-        ventana.update()
+    
         # Escanea
         Escaneo = lista_act[Pos_act] # Función de escanear QR
         color_act = Escaneo  # Es el color escaneado en la posición actual
         agarre_grua(color_act,X_Actual,Y_Actual)  #Simula que lo agarra
-        time.sleep(1.5)
-        ventana.update()
         color_des = lista_Carga[Pos_act].color
 
 
         if (color_des == color_act):
             # Se deja ahí, no agarra la caja
             lista_Carga[Pos_act].colocada = True
-            agarre_grua("n",X_Actual,Y_Actual)
-            time.sleep(1)
-            ventana.update()
+        
             # print("No se mueve, la caja para la posición ",Pos_act," ya está colocada")
             actualizar_Carga(color_act,X_destino, Y_destino)  # Se actualiza la interfaz
-            
-            time.sleep(1)
-            ventana.update
 
+            agarre_grua("n",X_Actual,Y_Actual)
+            
             
         else:
             colocada_ant = False  # Para validar si se colocó en pos ant en carga 
@@ -696,15 +740,15 @@ def acomodo_Cajas_2():
                         # Bajar_garra(True)
                         # Prender_iman(False)**
                         # Subir_garra (True)
-                        actualizar_Carga("w",X_destino, Y_destino)  # Se coloca cuadro blanco, grua naranja
+                        actualizar_Carga("w",X_destino, Y_destino)  # Se coloca cuadro blanco
+                        ventana.update()
+
+                        agarre_grua(color_act,X_Actual,Y_Actual)
                         X_destino = lista_Carga[i].posx
                         Y_destino =  lista_Carga[i].posy
                         mover_Grua_X(X_destino)
-                        time.sleep(0.3)
-                        ventana.update()
                         mover_Grua_Y(Y_destino)
-                        time.sleep(0.3)
-                        ventana.update()
+
 
                         colocada_ant = True
                         lista_Carga[i].colocada = True
@@ -762,7 +806,6 @@ def acomodo_Cajas_2():
                 lista_Suministro1[espacio].color = color_act
                 lista_Suministro1[espacio].ocupada = True
 
-                #Aquí la grua se pone amarilla
                 """
                 # Se mueve físicamente al lugar sum_x y sum_y
                 # Agarra la caja (Bajar_garra= ON -> imán = ON  -> Subir_garra=ON) y moverse a la posición i
@@ -860,7 +903,7 @@ def acomodo_Cajas_2():
             faltan += 1
 
     if faltan == 0:
-        print("¡Ya terminó el acomododo!")
+        print("¡Ya terminó el acomodo!")
 
         return
     else:
@@ -906,6 +949,17 @@ def acomodo_Cajas_2():
                     # Caso: Ni modo
                     #lista_carga[j].colocada = True
                     print("Para la posición ",j," para el color ",lista_Carga[j].color," no hay cajas disponibles")           
+        Mensaje.config(text="Volviendo a la posición inicial.")
+        X_Destino = tam_Bases
+        Y_Destino = tam_Bases
+        mover_Grua_X(X_Destino)
+        time.sleep(0.1)
+        ventana.update()
+
+        mover_Grua_Y(Y_Destino)
+        time.sleep(0.1)
+        Mensaje.config(text="Ha finalizado el acomodo.")
+        ventana.update()
         return
 
 
